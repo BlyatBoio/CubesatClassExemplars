@@ -86,6 +86,10 @@ function player(){
   if(keyIsDown(65)) playerX -= playerSpeed; // move left
   if(keyIsDown(68)) playerX += playerSpeed; // move right
 
+  // constrain the player to the scren, 25/-25 offsets account for the radius of the player
+  playerX = constrain(playerX, 25, width-25);
+  playerY = constrain(playerY, 25, height-25);
+
   // player collisions
   for(let i = 0; i < asteroids.length; i++){
     let d = dist(playerX, playerY, asteroids[i].x, asteroids[i].y); // get the distance from the player to the asteroid
