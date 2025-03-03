@@ -42,6 +42,8 @@ try:
 
 	maxErrorNumber = 100 #Maximum number of error messages stored on the SD card (Line five in Configuration.txt)
 
+	debugLevel = 1;#Defines the level of debugging required, from high level very important logs all the way down to the minutia
+	# ranges from 1 -> 5, 1 being minimal logging, 5 being advanced logging
 	###################################################################################################################
 
 	#Establishes data pins
@@ -140,7 +142,7 @@ try:
 	#Defines GPS object
 	class GPS: 
 			
-			#GPS constructor
+			#GPS __init__
 			def __init__(self, Latitude, Longitude, Altitude, Speed, Satellites, DOP):
 					
 					self.Latitude = Latitude
@@ -149,6 +151,10 @@ try:
 					self.Speed = Speed
 					self.Satellites = Satellites
 					self.DOP = DOP
+					if(debugLevel >= 3): 
+						print("GPS Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how GPS will be printed
 			def __repr__(self):
@@ -165,7 +171,8 @@ try:
 							)
 					
 					except:
-							
+							if(debugLevel >= 5):
+								print("GPS Data Printing Failed")
 							return "<Lat: {} degrees, Long: {} degrees, Altitude: {} m, Speed: {} m/s, Satellites: {}, DOP: {}>".format(
 									self.Latitude,
 									self.Longitude,
@@ -178,7 +185,7 @@ try:
 	#Defines ALTIMETER object
 	class ALTIMETER:
 			
-			#ALTIMETER constructor
+			#ALTIMETER __init__
 			def __init__(self, Altitude, Temperature, Pressure, Humidity, Gas):
 					
 					self.Altitude = Altitude
@@ -186,6 +193,10 @@ try:
 					self.Pressure = Pressure
 					self.Humidity = Humidity
 					self.Gas = Gas
+					if(debugLevel >= 3): 
+						print("Altimeter Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how ALTIMETER will be printed
 			def __repr__(self):
@@ -202,6 +213,8 @@ try:
 			
 					except:
 							
+							if(debugLevel >= 5):
+								print("GPS Data Printing Failed")
 							return "<Altitude: {} m, Temperature: {} C, Pressure: {} kPa, Humidity {} %, Gas: {} ohms>".format(
 									self.Altitude,
 									self.Temperature,
@@ -213,12 +226,16 @@ try:
 	#Defines ACCELEROMETER object
 	class ACCELEROMETER:
 			
-			#ACCELEROMETER constructor
+			#ACCELEROMETER __init__
 			def __init__(self, X, Y, Z):
 					
 					self.X = X
 					self.Y = Y
 					self.Z = Z
+					if(debugLevel >= 3): 
+						print("Accelerometer Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how ACCELEROMETER will be printed
 			def __repr__(self):
@@ -232,7 +249,8 @@ try:
 								)
 
 					except:
-
+							if(debugLevel >= 5):
+								print("GPS Data Printing Failed")
 							return "<X-Axis Acceleration: {} m/s^2, Y-Axis Acceleration: {} m/s^2, Z-Axis Acceleration: {} m/s^2>".format(
 									self.X,
 									self.Y,
@@ -242,12 +260,16 @@ try:
 	#Defines GYROSCOPE object
 	class GYROSCOPE:
 			
-			#GYROSCOPE constructor
+			#GYROSCOPE __init__
 			def __init__(self, X, Y, Z):
 					
 					self.X = X
 					self.Y = Y
-					self.Z = Z
+					self.Z = Z	
+					if(debugLevel >= 3): 
+						print("Gyroscope Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how GYROSCOPE will be printed
 			def __repr__(self):
@@ -261,7 +283,8 @@ try:
 								)
 
 					except:
-							
+							if(debugLevel >= 5):
+								print("GPS Data Printing Failed")
 							return "<X-Axis Rotational Velocity: {} radians/s, Y-Axis Rotational Velocity: {} radians/s, Z-Axis Rotational Velocity: {} radians/s>".format(
 									self.X,
 									self.Y,
@@ -271,12 +294,16 @@ try:
 	#Defines MAGNETOMETER object  
 	class MAGNETOMETER:
 			
-			#MAGNETOMETER constructor
+			#MAGNETOMETER __init__
 			def __init__(self, X, Y, Z):
 					
 					self.X = X
 					self.Y = Y
 					self.Z = Z
+					if(debugLevel >= 3): 
+						print("Magnometer Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how MAGNETOMETER will be printed
 			def __repr__(self):
@@ -291,6 +318,8 @@ try:
 
 					except:
 							
+							if(debugLevel >= 5):
+								print("Magnometer Data Printing Failed")
 							return "<X-Axis Field Strength: {} uT, Y-Axis Field Strength: {} uT, Z-Axis Field Strength: {} uT>".format(
 									self.X,
 									self.Y,
@@ -300,12 +329,16 @@ try:
 	#Defines POWER object
 	class POWER:
 			
-			#POWER constructor
+			#POWER __init__
 			def __init__(self, voltage, current, wattage):
 					
 					self.Voltage = voltage
 					self.Current = current
 					self.Wattage = wattage
+					if(debugLevel >= 3): 
+						print("Power Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how POWER will be printed
 			def __repr__(self):
@@ -319,7 +352,8 @@ try:
 							)
 
 					except:
-							
+							if(debugLevel >= 5):
+								print("Power Data Printing Failed")
 							return "<Voltage: {} V, Current: {} A, Wattage: {} W>".format(
 									self.Voltage,
 									self.Current,
@@ -329,11 +363,15 @@ try:
 	#Defines BATTERY object
 	class BATTERY:
 			
-			#BATTERY constructor
+			#BATTERY __init__
 			def __init__(self, voltage, percentage):
 					
 					self.Voltage = voltage
 					self.Percentage = percentage
+					if(debugLevel >= 3): 
+						print("Battery Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how BATTERY will be printed
 			def __repr__(self):
@@ -346,7 +384,8 @@ try:
 								)
 					
 					except:
-							
+							if(debugLevel >= 5):
+								print("Battery Data Printing Failed")
 							return "<Voltage: {} V, Percentage: {} %>".format(
 									self.Voltage,
 									self.Percentage
@@ -355,16 +394,20 @@ try:
 	#Defines SOLARPANEL object
 	class SOLARPANEL:
 			
-			#SOLARPANEL constructor
+			#SOLARPANEL __init__
 			def __init__(self, one, two, three):
 					
 					self.One = one
 					self.Two = two
 					self.Three = three
+					if(debugLevel >= 3): 
+						print("Solar Panel Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how SOLARPANEL will be printed
 			def __repr__(self):
-					
+				
 					return "Solar Panel Power Output One: {},\nSolar Panel Power Output Two: {},\nSolar Panel Power Output Three:{}".format(
 							self.One,
 							self.Two,
@@ -374,7 +417,7 @@ try:
 	#Defines ANALOG object
 	class ANALOG:
 			
-			#ANALOG constructor
+			#ANALOG __init__
 			def __init__(self, A0, A1, A2, A3, A4, A5, A6):
 					
 					self.A0 = A0
@@ -384,6 +427,10 @@ try:
 					self.A4 = A4
 					self.A5 = A5
 					self.A6 = A6
+					if(debugLevel >= 3): 
+						print("Analog Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 					
 			#Defines how ANALOG will be printed
 			def __repr__(self):
@@ -402,6 +449,8 @@ try:
 
 					except:
 							
+							if(debugLevel >= 5):
+								print("Analog Data Printing Failed")
 							return "<A0: {} V, A1: {} V, A2: {} V, A3: {} V, A4: {} V, A5: {} V, A6: {} V>".format(
 									self.A0,
 									self.A1,
@@ -415,7 +464,7 @@ try:
 	#Defines AVIONICSDATA object
 	class AVIONICSDATA:
 			
-			#AVIONICSDATA constructor
+			#AVIONICSDATA __init__
 			def __init__(self, TIME, GPS, ALTIMETER, ACCELEROMETER, GYROSCOPE, MAGNETOMETER, POWERDRAW, SOLARPANEL, BATTERY, ANALOG):
 					
 					self.TIME = TIME
@@ -428,10 +477,13 @@ try:
 					self.SOLARPANEL = SOLARPANEL
 					self.BATTERY = BATTERY
 					self.ANALOG = ANALOG
+					if(debugLevel >= 3): 
+						print("Avionics Data Setup Complete")
+						if(debugLevel >= 5):
+							print("\n"+self)
 			
 			#Defines how AVIONICSDATA will be printed
 			def __repr__(self):
-					
 					return "{}\nGPS: {},\nAltimeter: {},\nAccelerometer: {},\nGyroscope: {},\nMagnetometer: {},\nSystem Power Draw: {},\n{},\nBattery: {},\nAnalog: {}".format(
 							self.TIME,
 							self.GPS,
@@ -464,7 +516,8 @@ try:
 							gpsStatus = False
 							
 							#Attempts to get time from monotonic clock
-							print("\n[Using Monotonic Time]\n")
+							if(debugLevel >= 3):
+								print("\n[Using Monotonic Time]\n")
 							return round(clock.monotonic())
 					
 					except Exception as e:
@@ -505,7 +558,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get GPS Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get GPS Data Returned As None \n")
 					return GPS(
 							None,
 							None,
@@ -530,7 +584,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Altimeter Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Altimeter Data Returned As None \n")
 					return ALTIMETER(
 							None,
 							None,
@@ -552,7 +607,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Accelerometer Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Accelerometer Data Returned As None \n")
 					return ACCELEROMETER(
 							None,
 							None,
@@ -572,7 +628,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Gyroscope Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Gyroscope Data Returned As None \n")
 					return GYROSCOPE(
 							None,
 							None,
@@ -592,7 +649,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Magnometer Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Magnometer Data Returned As None \n")
 					return MAGNETOMETER(
 							None,
 							None,
@@ -612,7 +670,8 @@ try:
 
 			except:
 							
-					print("\n Failed to get Power Draw Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Power Draw Data Returned As None \n")
 					return POWER(
 							None,
 							None,
@@ -639,7 +698,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Solar Panel Output One Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Solar Panel Output One Data Returned As None \n")
 					solarData.One =  POWER(
 							None,
 							None,
@@ -705,7 +765,8 @@ try:
 			
 			except:
 					
-					print("\n Failed to get Battery Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Battery Data Returned As None \n")
 					return BATTERY(
 							None,
 							None
@@ -728,7 +789,8 @@ try:
 
 			except:
 					
-					print("\n Failed to get Analog Data Returned As None \n")
+					if(debugLevel >= 2):
+						print("\n Failed to get Analog Data Returned As None \n")
 					return ANALOG(
 						None,
 						None,
@@ -761,6 +823,7 @@ try:
 			
 			return data
 
+	#Converts a value into bytes
 	def convertData(value, numBytes):
 			endValue = 0
 			try:
@@ -823,7 +886,7 @@ try:
 			rawData += convertData(int(data.GYROSCOPE.Y*100), 2)
 			rawData += convertData(int(data.GYROSCOPE.Z*100), 2)
 					
-			#Convert gyroscope X, Y, and Z to bytes
+			#Convert Magnometer X, Y, and Z to bytes
 			rawData += convertData(int(data.MAGNETOMETER.X*100), 2)
 			rawData += convertData(int(data.MAGNETOMETER.Y*100), 2)
 			rawData += convertData(int(data.MAGNETOMETER.Z*100), 2)
@@ -869,8 +932,8 @@ try:
 					
 			except:
 					
-					print("\n[Unable to Find Stored Data]\n")
-					errorCode(2)
+				print("\n[Unable to Find Stored Data]\n")
+				errorCode(2)
 					
 	#Runs setup commands for the transceiver
 	def setupTransceiver():
@@ -1498,7 +1561,7 @@ try:
 					
 			except Exception as e:
 					
-					print("[Could Not Log Error]")
+					print("[Could Not Log Error]\n")
 					print(e)
 
 	#Acquires time from monotonic clock
@@ -1540,7 +1603,8 @@ try:
 			
 			#Process commands if one is received
 			if command != None:
-					
+					if(debugLevel >= 3):
+						print("Command Recieved")
 					receiveLed.value = True
 					
 					commandProcessor(command)
@@ -1550,13 +1614,17 @@ try:
 			if clock.monotonic() - measurementTicker > measurementInterval:
 					
 					measurementTicker = clock.monotonic()
-					
+					if(debugLevel >= 4):
+						print("Data Stored")
 					storeData(getRawData()) #Gets and stores data
 					
 			if clock.monotonic() - beaconTicker > beaconInterval:
 					
 					beaconTicker = clock.monotonic()
 							
+					if(debugLevel >= 4):
+						print("Beacon Sent")
+
 					sendBeacon()
 
 #Reboots device in the case of a critical error
