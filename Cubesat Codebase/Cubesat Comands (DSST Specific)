@@ -1,0 +1,36 @@
+Current List of A3Sat Commands:
+
+
+Set commands “set ▯▯”
+callsign - sets the callsign
+beaconInterval - sets the time between each beacon message
+measurementInterval - sets the time delay between when data is stored and measured
+dataMax - the maximum number of data values that can be stored on the SD Card
+errMax - the maximum number of error values that can be stored on the SD Card
+
+
+Get commands “get ▯”
+Current - prints the current state of the cubeSat with the getRawData() function
+file - prints the file located at  /sd/+[]+rb
+runtime - prints the amount of time the cubesat has been running for
+monotonic - prints the believed monotonic time on the cubesat
+UTC - Prints either the GPS.time or if it can't, reverts to the monotonic time
+dataNum - prints the number of data points logged on the SD Card
+errNum - prints the number of errors logged on the SD Card
+
+
+Get Data commands “get data ▯”
+GPS - Latitude, Longitude, Altitude, Speed, Satellites, Horizontal Dilution
+Altimeter - Altitude, Temperature, Pressure, Relative Humidity, (gas?)
+Accelerometer - Acceleration in X, Y, and Z
+Gyroscope - Gyroscopic rotation in X, Y, and Z
+Magnetometer - Magnetic forces in X, Y, and Z
+powerDraw - Voltage, Current, Wattage
+Solar - (3 solar busses, 3 different variable sets) 3x (Voltage, Current Wattage)
+Battery - Voltage, Percent
+All - prints the getAvionicsData function which groups all of the different data sets into one set of data and prints it.
+
+
+Cube.___ commands “cube.▯”
+reload - Reloads the cubesat
+ping - attempts to ping the cubesat, will print pong if the command is received
