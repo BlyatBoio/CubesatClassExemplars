@@ -1,0 +1,7 @@
+Imports from lines 3->21 will throw errors in VS code, they work on the cubesat but are not present on a basic computer and as such, will cause errors
+All of the board definitions from lines 50->109 are as they should be. 
+Unless you change the physical structure of the cubesat and where different components are soldered, they should remain the same
+the "componentName = None" lines from 112->122 are simply defining variables so that they can be assigned their propper classes
+There should be no errors from the fact that they are defined as none and later refferenced.
+Lines 143 -> 499 are copy/paste class definitions for each type of component on the cubesat. 
+Each as an __init__() function that is the constructor
