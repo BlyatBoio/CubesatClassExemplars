@@ -1634,11 +1634,15 @@ except Exception as e:
 			
 			print("Critical Error: " + str(e))
 			errorCode(1, e)
-	
-			microcontroller.reset()
+			#Comment out to have continuous connection to the cubeSat
+			#If it continuously disconnects and reconnects, comenting this out stops that
+			#microcontroller.reset()
+
 	
 	except:
 	
 			print("Could Not Save Error")
-			microcontroller.reset()
+			#Comment out to have continuous connection to the cubeSat
+			#If it continuously disconnects and reconnects, comenting this out stops that
+			#microcontroller.reset()
 	
