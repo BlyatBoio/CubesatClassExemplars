@@ -1,7 +1,60 @@
 Imports from lines 3->21 will throw errors in VS code, they work on the cubesat but are not present on a basic computer and as such, will cause errors
+
 All of the board definitions from lines 50->109 are as they should be. 
 Unless you change the physical structure of the cubesat and where different components are soldered, they should remain the same
-the "componentName = None" lines from 112->122 are simply defining variables so that they can be assigned their propper classes
+
+the "componentName = None" lines from 112->122 are simply defining variables so that they can be assigned their propper classes later
 There should be no errors from the fact that they are defined as none and later refferenced.
+
 Lines 143 -> 499 are copy/paste class definitions for each type of component on the cubesat. 
 Each as an __init__() function that is the constructor
+Below this is a __repr__() function that effectively returns a string with the different data collected by the sensor
+It defines how it is printed out or sent back to the ground station in things like getRawData()
+
+After this from lines 500 -> 804 are Getter functions for each class, simply returning the __repr__() funciton of each class
+
+the getRawData() function collects all of the data from every sensor, converts that data into bytes with the 
+convertData() function, and return that string of bytes.
+
+getSpecificData() refferences a file name onboard the SD card that it then tries to access and return said data
+
+from lines 925 -> 1159, it is setup functions, asigning the different classes (GPS, Altimeter, etc.) to their pre-defined variables
+
+storeData() is self explanatory, saves a piece of data, or a number to a specific location on the SD card
+
+Transmit() uses the tranciever to send a packet, used to transmit data back to the groundstation
+
+sendBeacon() calls transmit after assembling a string of data from the GPS, IMU, Altimeter, etc.
+
+the commandProcessor() takes in an input command, and through a lot of if/else statements, determines what the command means
+and applies it. Would have used a switch statement, but the school computers blocked me trying to update to a newer version of python
+that had switch statement equivalents, so we are stuck with elif statements
+Doccumentation for the different comands you can use are found in:
+https://docs.google.com/document/d/1sVO6tE0tkqgubVj1gWznjYgsYm2ghXz23cVP7W-xjRw/edit?tab=t.0
+
+reloadConfiguration() as the name implies, changes the values in Configuration.txt file on the SD card with any changed variables
+(callsign, beacon interval, measurement interval, maximum data number, maximum error number)
+
+saveConfiguration() does the same thing, but directly writes those same variable in Configuration.txt
+
+resumeState() looks at the stateBackup file and reads in the values from that file
+
+updateDataNumber() does as implied and sets the data number to the proper value. 
+dataNumber is used as a measurement of how much data is stored on the SD and is used therefore to ensure we are not over-storing data
+
+saveState() saves the current values to the stateBackup file to be used when calling resumeState()
+
+errorCode() is a simple error loging function that stores the errors on the SD card
+log() is a simple loging function that stores values on the SD card
+
+lines 1575 -> 1598 call the setup functions and ensure each variable has its assigned class
+
+the while(true) is the main loop run onboard the cubesat
+
+In here, we update the GPS to get position and time
+Call the command processor
+update the monotonic clock 
+Based on the value of the monotonic clock and the config (beaconInterval and measurementInterval) 
+measure the values from the sensor and send them back to the ground
+
+After this, there is just the except function that prints "critical error occured" and then resets the raspberry PI
