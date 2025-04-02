@@ -58,3 +58,10 @@ Based on the value of the monotonic clock and the config (beaconInterval and mea
 measure the values from the sensor and send them back to the ground
 
 After this, there is just the except function that prints "critical error occured" and then resets the raspberry PI
+
+Important Info:
+  Each log written to the SD Card is 82 bytes 
+  (add all of the numBytes values in the getRawData function)
+  Speed_Knots (as origonaly written) does not exist, the var name is just speed
+  The naming of the code file at the very least on the pi itself is very important.
+  (Should be named code, lowercase c, nothing extra, If you have something else, the PI will not recognize the file and will not run it)
