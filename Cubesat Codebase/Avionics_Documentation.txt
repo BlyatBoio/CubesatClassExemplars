@@ -69,7 +69,6 @@ How To Read Logs Straight From The SD Card:
   In VS Code: download the Binary Viewer Extension
   open the SD folder in VS Code and right click the file you wish to view
   In the menu, click "Open With Hexadecimal" and this will use the binary viewer extension.
-  In the drop-down menu, select int16 for the format, as well as unsigned. 
+  In the drop-down menu, select int16 for the format, as well as unsigned AND bigendian. 
   int32, int64, ascii, float32, etc. will all display incorrect values.
-  The checkbox for bigendian has also both fixed and messed up values. If you have a known constant, refference it and see if it is 
   correct for bigendian on or off. (IE: have a constant value like 1752 added to the start of every log and see if 1752 appears)
