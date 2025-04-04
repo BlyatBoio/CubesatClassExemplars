@@ -31,6 +31,8 @@ and applies it. Would have used a switch statement, but the school computers blo
 that had switch statement equivalents, so we are stuck with elif statements
 Doccumentation for the different comands you can use are found in:
 https://docs.google.com/document/d/1sVO6tE0tkqgubVj1gWznjYgsYm2ghXz23cVP7W-xjRw/edit?tab=t.0
+Or also in this repository:
+(https://github.com/BlyatBoio/CubesatClassExemplars/edit/main/Cubesat%20Codebase)
 
 reloadConfiguration() as the name implies, changes the values in Configuration.txt file on the SD card with any changed variables
 (callsign, beacon interval, measurement interval, maximum data number, maximum error number)
@@ -60,7 +62,7 @@ measure the values from the sensor and send them back to the ground
 After this, there is just the except function that prints "critical error occured" and then resets the raspberry PI
 
 Important Info:
-  Each log written to the SD Card is 82 bytes 
+  Each log written to the SD Card is 82 bytes (Outdated)
   (add all of the numBytes values in the getRawData function)
   Speed_Knots (as origonaly written) does not exist, the var name is just speed
   The naming of the code file at the very least on the pi itself is very important.
@@ -71,4 +73,4 @@ How To Read Logs Straight From The SD Card:
   In the menu, click "Open With Hexadecimal" and this will use the binary viewer extension.
   In the drop-down menu, select int16 for the format, as well as unsigned AND bigendian. 
   int32, int64, ascii, float32, etc. will all display incorrect values.
-  correct for bigendian on or off. (IE: have a constant value like 1752 added to the start of every log and see if 1752 appears)
+  
