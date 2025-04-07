@@ -20,6 +20,8 @@ from adafruit_pcf8591.analog_out import AnalogOut
 from adafruit_datetime import datetime, date, time
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
+import random
+
 
 try:
 	
@@ -34,10 +36,10 @@ try:
 
 	###################################################################################################################
 
-	callsign = "N0CALL" #[CHANGE BEFORE LAUNCH] Sets the callsign for the device (Line one in Configuration.txt)
+	callsign = "monkeyPox" #[CHANGE BEFORE LAUNCH] Sets the callsign for the device (Line one in Configuration.txt)
 	beaconInterval = 5 #Controls the interval of beacon signal (Line two in Configuration.txt)
 
-	measurementInterval = 10 #Controls interval of data collection (Line three in Configuration.txt)
+	measurementInterval = 5 #Controls interval of data collection (Line three in Configuration.txt)
 	maxDataNumber = 100000 #Maximum number of data measurements stored on the SD card (Line four in Configuration.txt)
 
 	maxErrorNumber = 100 #Maximum number of error messages stored on the SD card (Line five in Configuration.txt)
@@ -57,7 +59,7 @@ try:
 		board.GP10,
 		MOSI=board.GP11,
 		MISO=board.GP12
-	)
+	)	
 
 	CS1 = digitalio.DigitalInOut(board.GP13)
 
@@ -138,6 +140,8 @@ try:
 
 	#Defines the errorNumber counter globally
 	errorNumber = -1 #Line three in StateBackup.txt
+
+	currentLED = 0;
 
 	#Defines GPS object
 	class GPS: 
@@ -551,7 +555,7 @@ try:
 							gps.latitude,
 							gps.longitude,
 							gps.altitude_m,
-							gps.speed_knots*(463/900),
+							gps.speed_knots,#*(463/900) Currently exists as none and mutiplying by integers throws errors
 							gps.satellites,
 							gps.horizontal_dilution
 						)
@@ -578,12 +582,13 @@ try:
 							bme.altitude,
 							bme.temperature + temperature_offset, #Applies temperature offset
 							bme.pressure,
-							bme.relative_humidity,
+							bme.humidity,
 							round(bme.gas)
 						)
 
 			except:
 					
+					errorLed.value = True;
 					if(debugLevel >= 2):
 						print("\n Failed to get Altimeter Data Returned As None \n")
 					return ALTIMETER(
@@ -804,8 +809,6 @@ try:
 	#Acquires data from all sensors at once
 	def getAvionicsData():
 			
-			processLed.value = True
-			
 			data = AVIONICSDATA(
 					getTime(),
 					getGpsData(),
@@ -819,107 +822,118 @@ try:
 					getAnalogData()
 				)
 
-			processLed.value = False
-			
 			return data
 
 	#Converts a value into bytes
-	def convertData(value, numBytes):
-			endValue = 0
+	def convertData(value, numBytes, multValue):
+			# in order to make code simpler, the value is checkde within this function to be none
+			# almost all values are made int() then *___ a scaling factor which takes place through the multValue
+			# we chech if they arent none because it throws a fatal error when trying to convert int(None)
 			try:
-				endvalue = (value).to_bytes(numBytes, 'big', signed = 'True')
+				if(value != None):
+					return (int(value)*multValue).to_bytes(numBytes, 'big', signed = 'True')
+				return int(0).to_bytes(numBytes, 'big', signed = 'True')
 			except:
-				endValue = (0).to_bytes(numBytes, 'big', signed = 'True')
-
-			return endvalue
-
+				return int(0).to_bytes(numBytes, 'big', signed = 'True')
+			
 	#Acquired and encodes data into bytes
 	def getRawData():
 			
+			processLed.value = True;
 			rawData = bytes()
 			
 			#Acquires data from all sensors
 			data = getAvionicsData()
 			
-			print("\n" + "="*150 + "\n" + str(data) + "\n" + "="*150 + "\n")
-
 			#Converts year, month, day, hour, minute, and second to bytes
-			try:
-					rawData += (
-							data.TIME.year.to_bytes(2, 'big', signed='True') +
-							data.TIME.month.to_bytes(1, 'big', signed='True') +
-							data.TIME.day.to_bytes(1, 'big', signed='True') +
+			#try:
+					#rawData += (
+							#data.TIME.year.to_bytes(2, 'big', signed='True') +
+							#data.TIME.month.to_bytes(2, 'big', signed='True') +
+							#data.TIME.day.to_bytes(2, 'big', signed='True') +
 							
-							data.TIME.hour.to_bytes(1, 'big', signed='True') +
-							data.TIME.minute.to_bytes(1, 'big', signed='True') +
-							data.TIME.second.to_bytes(1, 'big', signed='True'))
-			except:
+							#data.TIME.hour.to_bytes(2, 'big', signed='True') +
+							#data.TIME.minute.to_bytes(2, 'big', signed='True') +
+							#data.TIME.second.to_bytes(2, 'big', signed='True'))
+			#except:
 					
-					try:
-							rawData += (int(data.TIME)).to_bytes(7, 'big', signed='True')
-					except:
-							rawData += (int(clock.monotonic())).to_bytes(7, 'big', signed='True')
+					#try:
+							#rawData += (data.TIME).to_bytes(2, 'big', signed='True')
+					#except:
+							#rawData += (clock.monotonic()).to_bytes(2, 'big', signed='True')
 			
 			#Converts GPS latitude, longitude, altitude, speed, satellites, and DOP to bytes
-
-			rawData += convertData(int(data.GPS.Latitude*10000000), 4)            
-			rawData += convertData(int(data.GPS.Longitude*10000000), 4)  
-			rawData += convertData(int(data.GPS.Altitude*100, 4))               
-			rawData += convertData(int(data.GPS.Speed*100), 3)         
-			rawData += convertData(int(data.GPS.Satellites), 1)         
-			rawData += convertData(int(data.GPS.DOP*100), 2)   
+			rawData += convertData(1, 4, 1)            
+			rawData += convertData(data.GPS.Latitude, 4, 100)            
+			rawData += convertData(data.GPS.Longitude, 4, 100)  
+			rawData += convertData(data.GPS.Altitude, 4, 100)               
+			rawData += convertData(data.GPS.Speed, 4, 100)         
+			#rawData += convertData(data.GPS.Satellites, 1)         
+			rawData += convertData(data.GPS.DOP, 4, 100)   
 			
 			#Converts altimeter altitude, temperature, pressure, humidty, and gas to bytes
-			rawData += convertData(int(data.ALTIMETER.Altitude*100), 4)
-			rawData += convertData(int(data.ALTIMETER.Temperature*100), 2)
-			rawData += convertData(int(data.ALTIMETER.Pressure*100), 3)
-			rawData += convertData(int(data.ALTIMETER.Humidity*100), 2)
-			rawData += convertData(int(data.ALTIMETER.Gas), 2)
-			
+			rawData += convertData(2, 4, 1)            
+			rawData += convertData(data.ALTIMETER.Altitude, 4, 100)
+			rawData += convertData(data.ALTIMETER.Temperature, 4, 1)
+			rawData += convertData(data.ALTIMETER.Pressure, 4, 100)
+			rawData += convertData(data.ALTIMETER.Humidity, 4, 100)
+			rawData += convertData(data.ALTIMETER.Gas, 4, 100)
+		
 			#Convert accelerometer X, Y, and Z to bytes
-			rawData += convertData(int(data.ACCELEROMETER.X*100), 2)
-			rawData += convertData(int(data.ACCELEROMETER.Y*100), 2)
-			rawData += convertData(int(data.ACCELEROMETER.Z*100), 2)
-			
+			rawData += convertData(3, 4, 1)            
+			rawData += convertData(data.ACCELEROMETER.X, 4, 100)
+			rawData += convertData(data.ACCELEROMETER.Y, 4, 100)
+			rawData += convertData(data.ACCELEROMETER.Z, 4, 100)
+		
 			#Convert gyroscope X, Y, and Z to bytes
-			rawData += convertData(int(data.GYROSCOPE.X*100), 2)
-			rawData += convertData(int(data.GYROSCOPE.Y*100), 2)
-			rawData += convertData(int(data.GYROSCOPE.Z*100), 2)
-					
+			rawData += convertData(4, 4, 1)            
+			rawData += convertData(data.GYROSCOPE.X*100, 4, 100)
+			rawData += convertData(data.GYROSCOPE.Y*100, 4, 100)
+			rawData += convertData(data.GYROSCOPE.Z*100, 4, 100)
+				
 			#Convert Magnometer X, Y, and Z to bytes
-			rawData += convertData(int(data.MAGNETOMETER.X*100), 2)
-			rawData += convertData(int(data.MAGNETOMETER.Y*100), 2)
-			rawData += convertData(int(data.MAGNETOMETER.Z*100), 2)
+			rawData += convertData(5, 4, 1)            
+			rawData += convertData(data.MAGNETOMETER.X, 4, 100)
+			rawData += convertData(data.MAGNETOMETER.Y, 4, 100)
+			rawData += convertData(data.MAGNETOMETER.Z, 4, 100)
 					
 			#Convert power draw voltage, current, and wattage to bytes
-			rawData += convertData(int(data.POWERDRAW.Voltage*1000), 2)
-			rawData += convertData(int(data.POWERDRAW.Current*1000), 2)
-			rawData += convertData(int(data.POWERDRAW.Wattage*1000), 2)
+			rawData += convertData(6, 4, 1)            
+			rawData += convertData(data.POWERDRAW.Voltage, 4, 1000)
+			rawData += convertData(data.POWERDRAW.Current, 4, 1000)
+			rawData += convertData(data.POWERDRAW.Wattage, 4, 1000)
 			
 			#Convert solar panel voltage, current, and wattage for panel sets one, two, and three to bytes
-			rawData += convertData(int(data.SOLARPANEL.One.Voltage*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.One.Current*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.One.Wattage*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Two.Voltage*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Two.Current*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Two.Wattage*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Three.Voltage*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Three.Current*1000), 2)
-			rawData += convertData(int(data.SOLARPANEL.Three.Wattage*1000), 2)
+			#if(data.SOLARPANEL.One.Voltage != None):
+			rawData += convertData(7, 4, 1)            
+			rawData += convertData(data.SOLARPANEL.One.Voltage, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.One.Current, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.One.Wattage, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Two.Voltage, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Two.Current, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Two.Wattage, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Three.Voltage, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Three.Current, 4, 1000)
+			rawData += convertData(data.SOLARPANEL.Three.Wattage, 4, 1000)
 					
 			#Convert battery voltage and percentage to bytes
-			rawData += convertData(int(data.BATTERY.Voltage*100), 2)
-			rawData += convertData(int(data.BATTERY.Percentage*100), 2)
+			rawData += convertData(8, 4, 1)            
+			rawData += convertData(data.BATTERY.Voltage, 4, 100)
+			rawData += convertData(data.BATTERY.Percentage, 4, 100)
 					
 			#Convert analog voltage to bytes
-			rawData += convertData(int(data.ANALOG.A0*100), 2)
-			rawData += convertData(int(data.ANALOG.A1*100), 2)
-			rawData += convertData(int(data.ANALOG.A2*100), 2)
-			rawData += convertData(int(data.ANALOG.A3*100), 2)
-			rawData += convertData(int(data.ANALOG.A4*100), 2)
-			rawData += convertData(int(data.ANALOG.A5*100), 2)
-			rawData += convertData(int(data.ANALOG.A6*100), 2)
-			
+			rawData += convertData(9, 4, 1)            
+			rawData += convertData(data.ANALOG.A0, 4, 100)
+			rawData += convertData(data.ANALOG.A1, 4, 100)
+			rawData += convertData(data.ANALOG.A4, 4, 100)
+			rawData += convertData(data.ANALOG.A3, 4, 100)
+			rawData += convertData(data.ANALOG.A4, 4, 100)
+			rawData += convertData(data.ANALOG.A5, 4, 100)
+			rawData += convertData(data.ANALOG.A6, 4, 100)
+
+			# 55 data points stored
+						
+			processLed.value = False;			
 			return rawData
 
 	#Grabs data from a specific recording
@@ -968,6 +982,7 @@ try:
 					
 					print("\n[Unable to Setup GPS]\n")
 					errorCode(3, e)
+			log(gps)
 
 	#Runs setup commands for the altimeter
 	def setupAltimeter():
@@ -1117,7 +1132,6 @@ try:
 						)
 				
 			except Exception as e:
-					
 					print("\n[Unable to Connect to Battery Sensor]\n")
 					errorCode(1, e)
 
@@ -1217,7 +1231,8 @@ try:
 			try:
 					
 					clock.sleep(0.25) #Delay to prevent altimeter oversampling
-					
+					transmitLed.value = True;
+
 					if beaconSequence == 0:
 							
 							beaconSequence += 1
@@ -1272,6 +1287,7 @@ try:
 					print("\n" + callsign + " <" + beaconSensor + dataString + beaconUnits + ">\n")
 					
 					clock.sleep(0.25) #Delay to prevent altimeter oversampling
+					transmitLed.value = False;
 					
 			except Exception as e:
 
@@ -1564,8 +1580,64 @@ try:
 					print("[Could Not Log Error]\n")
 					print(e)
 
-	#Acquires time from monotonic clock
+	def log(message):
+		try:
+				errorNumber += 1
+						
+				if errorNumber >= maxErrorNumber:
+						
+						with open("/sd/ErrorLog.txt", "w") as errorFile:
+								errorFile.write("")
+						
+						errorNumber = 0
+				
+				saveState() #Updates backup information
+				
+				with open("/sd/ErrorLog.txt", "a") as errorFile:
+						errorFile.write("[" + str(getTime()) + "] " + str(message) + "\n")
+				
+		except Exception as e:
+				
+				print("[Could Not Log]\n")
+				print(e)
 
+	def testLeds():
+			if(random.randint(0, 1) == 1):
+				if(gpsLed.value == True):
+					gpsLed.value = False
+				else:
+					gpsLed.value = True
+			
+			if(random.randint(0, 1) == 1):
+				if(transmitLed.value == True):
+					transmitLed.value = False
+				else:
+					transmitLed.value = True
+			
+			if(random.randint(0, 1) == 1):
+				if(receiveLed.value == True):
+					receiveLed.value = False
+				else:
+					receiveLed.value = True
+			
+			if(random.randint(0, 1) == 1):
+				if(processLed.value == True):
+					processLed.value = False
+				else:
+					processLed.value = True
+			
+			if(random.randint(0, 1) == 1):
+				if(errorLed.value == True):
+					errorLed.value = False
+				else:
+					errorLed.value = True
+			if(random.randint(0, 1) == 1):
+				if(imbeddedLed.value == True):
+					imbeddedLed.value = False
+				else:
+					imbeddedLed.value = True
+	
+	#Acquires time from monotonic clock
 	uptimeTicker = clock.monotonic()
 	
 	measurementTicker = clock.monotonic()
@@ -1588,16 +1660,19 @@ try:
 	setupMag()
 	setupPowerDraw()
 	setupSolar()
-	setupBattery()
+	# If battery is not plugged in for testing or what have you, it will error and reset code trying to run setupBattery
+	#setupBattery()
 	setupAnalog()
+
 
 	#Main program loop
 	while True:
-			
 			#Updates GPS
 			gps.update()
-			gpsLed.value = gpsStatus
-			
+			gpsLed.value = True
+
+			#testLeds()
+
 			#Listen for transmitted commands
 			command = transceiver.read(960)
 			
@@ -1611,13 +1686,15 @@ try:
 					
 					receiveLed.value = False
 			
+			# Measure and store the data on an interval
 			if clock.monotonic() - measurementTicker > measurementInterval:
 					
 					measurementTicker = clock.monotonic()
 					if(debugLevel >= 4):
 						print("Data Stored")
 					storeData(getRawData()) #Gets and stores data
-					
+
+			# Send the beacon back down on the predefined beaconInterval=
 			if clock.monotonic() - beaconTicker > beaconInterval:
 					
 					beaconTicker = clock.monotonic()
@@ -1625,7 +1702,7 @@ try:
 					if(debugLevel >= 4):
 						print("Beacon Sent")
 
-					sendBeacon()
+					#sendBeacon()
 
 #Reboots device in the case of a critical error
 except Exception as e:
@@ -1644,5 +1721,6 @@ except Exception as e:
 			print("Could Not Save Error")
 			#Comment out to have continuous connection to the cubeSat
 			#If it continuously disconnects and reconnects, comenting this out stops that
+			#(File explorer opens to the raspberry pie, closes to desktop, opens new tab, etc. etc.)
 			#microcontroller.reset()
 	
