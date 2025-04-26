@@ -1,0 +1,28 @@
+The groundstation is by far one of the most finickey pieces of code in this entire codebase.
+
+Edditing:
+  1. the ground station exists as a .EXE file which you can not directly edit and make changes to.
+  2. in order to edit the ground station, you need to re-compile the .EXE from python files (included in this repository)
+  3. In specific, you need the app.py file, the avionics classes.py file, the guiThreading.py files, the UI Saves folder, and the large.ui file.
+  4. to compile it, you need an unblocked computer as you need to have pip(python package installer) in order to install dependancies and pyinstaller (our compiler)
+  5. The online guide for installing pip is useful and correct most often, the one big misshap that can happen is not including the path to your python scripts folder in environment variables
+    a. to ensure this, go into search and type env, and open the top resulet (edit system environment variables
+    b. Click the button in the bottom right to open the environment variables tab.
+    c. Double click the "Path" option and ensure a file with the structure "C:\Users\(yourName)\AppData\Local\Programs\Python\Python38\Scripts\"
+    d. If there is not, add it in
+  6. With PIP installed, run the command pip install pyinstaller - to install the python compiler
+  7. run the command pip install pyserial==3.4 - to install a ground station dependency with the correct version of 3.4
+  8. last but not least, run pip install pyqt5 - to install another dependancy, regardless of version as far as I am aware
+  9. Now, create a file close to your root directory so it is easy access inside cmd line
+  10. in this file, place your app.py, avionicsClasses.py, guiThreading.py, UI Saves folder, and large.ui file
+  11. large.ui doesent technicaly need to be in this folder specifically but it does need to be in the same folder as the .exe when you run it and it is simply easier to access here
+  12. Open cmd line and use cd to naviage to your folder that contains app.py
+  13. Any major changes to ground station functionality should be done through app.py and it is the main file you will compile
+  14. once you have navigated here, run the command pyinstaller --onefile app.py
+  15. this compiles app.py into a one file exe and at the same time, compiles all of its dependenceies if they are availible on the system (this is why we did step 7 and 8)
+  16. in that same folder, there should now be two new folders and one new file. (Build, Dist, and app.spec)
+    a. build contains a build.warn file that details any issues that may have occured durring the compilation and is useful for debugging
+    b. dist contains our app.exe file and is where you should move the large.UI file into.
+  17. re-compilling the app using the same command does not require you to delete the previously created files, it simply writes over them and replaces them with a new version
+  18. every time you make a change in app.py, you need to re-compile it using the aforementioned command in order for it to take effect in the app.exe.
+  19. this same process can be done with the data decoder
